@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kedai Udang Keju - Lumer & Gurih</title>
+  <title>Kedai Udang Keju - Saus Bangkok</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -30,9 +30,9 @@
     <div class="hidden md:block text-amber-200"><i class="fa-solid fa-clock mr-1"></i> Ready: Senin - Jumat (15.00 - 21.00)</div>
     <div class="mx-auto md:mx-0 flex items-center gap-2">
       <span class="bg-amber-400 text-xs px-2 py-0.5 rounded font-bold text-gray-900">BISA COD</span>
-      <span>Keju Lumer & Udang Gurih • <strong>Cuma Rp 7.000!</strong></span>
+      <span>Udang Keju Saus Bangkok • <strong>Cuma Rp 7.000!</strong></span>
     </div>
-    <div class="hidden md:block text-xs text-amber-100"><i class="fa-brands fa-whatsapp mr-1"></i> 081996877864</div>
+    <div class="hidden md:block text-xs text-amber-100"><i class="fa-solid fa-store mr-1"></i> Kedai Udang Keju</div>
   </div>
 
   <!-- HEADER -->
@@ -41,7 +41,7 @@
       <a href="#" class="flex items-center gap-3">
         <div class="w-11 h-11 bg-amber-400 rounded-xl flex items-center justify-center text-orangeTheme-primary font-black text-xl shadow border-2 border-amber-200">UK</div>
         <div>
-          <span class="text-xl md:text-2xl font-black tracking-tight block leading-none">UDANG KEJU</span>
+          <span class="text-xl md:text-2xl font-black tracking-tight block leading-none">KEDAI UDANG KEJU</span>
           <span class="text-[10px] text-amber-100 tracking-wider uppercase font-semibold">Renyah Di Luar, Lumer Di Dalam</span>
         </div>
       </a>
@@ -64,8 +64,8 @@
         <div class="inline-flex items-center gap-2 bg-white/20 text-white border border-white/30 px-3 py-1 rounded-full text-xs font-bold mb-3">
           <i class="fa-solid fa-cheese"></i> Keju Lumer & Udang Gurih
         </div>
-        <h1 class="text-2xl md:text-4xl font-extrabold mb-2 leading-tight">Udang Keju Krispi - Cuma Rp 7.000!</h1>
-        <p class="text-amber-100 text-sm md:text-base mb-4">Nikmati kelezatan udang gurih berlapis keju lumer dengan harga super terjangkau.</p>
+        <h1 class="text-2xl md:text-4xl font-extrabold mb-2 leading-tight">Udang Keju Saus Bangkok - Cuma Rp 7.000!</h1>
+        <p class="text-amber-100 text-sm md:text-base mb-4">Perpaduan udang gurih, keju lumer, dan saus bangkok manis asam pedas yang menggugah selera.</p>
         <div class="flex flex-wrap gap-2 text-xs font-bold">
           <span class="bg-white/20 px-3 py-1 rounded-lg">✨ Renyah di luar</span>
           <span class="bg-white/20 px-3 py-1 rounded-lg">🧀 Lumer di dalam</span>
@@ -77,9 +77,9 @@
     <!-- MENU SECTION -->
     <section id="menu-section" class="mb-10">
       <h2 class="text-2xl font-black text-orangeTheme-primary mb-6 flex items-center gap-2">
-        <i class="fa-solid fa-utensils"></i> Pilih Menu Udang Keju
+        <i class="fa-solid fa-utensils"></i> Menu Udang Keju
       </h2>
-      <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
+      <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-2xl gap-4 md:gap-6"></div>
     </section>
   </main>
 
@@ -113,7 +113,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold mb-1">Nomor WhatsApp *</label>
-          <input type="tel" id="custWA" required placeholder="Contoh: 081996877864" class="w-full border p-2.5 text-sm rounded-lg">
+          <input type="tel" id="custWA" required placeholder="Contoh: 08123456789" class="w-full border p-2.5 text-sm rounded-lg">
         </div>
         <div>
           <label class="block text-xs font-bold mb-1">Share Lokasi Maps (Opsional)</label>
@@ -121,17 +121,14 @@
         </div>
         <div>
           <label class="block text-xs font-bold mb-1">Alamat Lengkap / Catatan</label>
-          <textarea id="custNotes" rows="2" placeholder="Detail alamat atau level pedas saus" class="w-full border p-2.5 text-sm rounded-lg"></textarea>
+          <textarea id="custNotes" rows="2" placeholder="Detail alamat rumah atau instruksi pengiriman" class="w-full border p-2.5 text-sm rounded-lg"></textarea>
         </div>
         <div>
           <label class="block text-xs font-bold mb-1">Metode Pembayaran *</label>
-          <select id="payMethod" onchange="togglePaymentDetails()" class="w-full border p-2.5 text-sm rounded-lg font-bold">
+          <select id="payMethod" class="w-full border p-2.5 text-sm rounded-lg font-bold">
             <option value="COD / Cash">COD (Bayar Tunai saat Kurir Sampai)</option>
-            <option value="Transfer BNI">Transfer Bank BNI</option>
+            <option value="Transfer Bank">Transfer Bank</option>
           </select>
-        </div>
-        <div id="paymentDetailBox" class="hidden bg-amber-50 p-3 rounded-xl border text-xs space-y-1">
-          <strong>Rekening BNI:</strong> <span class="font-black text-orangeTheme-primary">1888719845</span> (a.n Tri Wulandari)
         </div>
         <button type="submit" id="btnSubmitOrder" class="w-full bg-orangeTheme-primary hover:bg-orangeTheme-secondary text-white font-bold py-3 rounded-xl shadow">Konfirmasi & Kirim Pesanan</button>
       </form>
@@ -148,7 +145,7 @@
       <div class="space-y-2">
         <label class="block text-xs font-bold">Masukkan Nomor WhatsApp Anda:</label>
         <div class="flex gap-2">
-          <input type="tel" id="searchWA" placeholder="0819..." class="flex-1 border p-2 text-sm rounded-lg">
+          <input type="tel" id="searchWA" placeholder="08..." class="flex-1 border p-2 text-sm rounded-lg">
           <button onclick="searchCustomerOrders()" class="bg-orangeTheme-primary text-white font-bold px-4 py-2 rounded-lg text-xs">Cari</button>
         </div>
       </div>
@@ -167,14 +164,14 @@
   </div>
 
   <script>
-    // Konfigurasi Firebase baru milik Proyek 'kedai-udang-keju'
+    // Konfigurasi Firebase baru dari screenshot
     const firebaseConfig = {
-      apiKey: "AIzaSyBAiwVewOqxDafgK7OXLztvPaVSA3QWIDU",
+      apiKey: "AIzaSyBAiwVewOqDafgK7OKLztvPeVSA3QWiDU",
       authDomain: "kedai-udang-keju.firebaseapp.com",
       projectId: "kedai-udang-keju",
       storageBucket: "kedai-udang-keju.firebasestorage.app",
-      messagingSenderId: "322855383380",
-      appId: "1:322855383380:web:a5119d5d7e24bfb8e058c1",
+      messagingSenderId: "322855383300",
+      appId: "1:322855383300:web:a5119d5d7e24bfb8e058c1",
       measurementId: "G-D4VPMGPNZH"
     };
 
@@ -182,9 +179,7 @@
     const db = firebase.firestore();
 
     const initialDefaultProducts = [
-      { id: "1", name: 'Udang Keju Porsi Regular (Isi 4)', price: 7000, stock: 30, badge: 'Terlaris', img: '' },
-      { id: "2", name: 'Udang Keju Super Pedas', price: 7000, stock: 25, badge: 'Favorit', img: '' },
-      { id: "3", name: 'Udang Keju Extra Keju Lumer', price: 7000, stock: 20, badge: 'Spesial', img: '' }
+      { id: "saus-bangkok", name: 'Udang Keju Saus Bangkok', price: 7000, stock: 30, badge: 'Menu Utama', img: '' }
     ];
 
     let products = [];
@@ -208,7 +203,7 @@
         const isOutOfStock = p.stock <= 0;
         const imageHTML = p.img 
           ? `<img src="${p.img}" class="w-full h-full object-cover">`
-          : `<div class="w-full h-full bg-amber-100 flex flex-col items-center justify-center text-amber-600"><i class="fa-solid fa-image text-3xl mb-1"></i><span class="text-[10px] font-bold">Foto belum diupload</span></div>`;
+          : `<div class="w-full h-full bg-amber-100 flex flex-col items-center justify-center text-amber-600"><i class="fa-solid fa-image text-4xl mb-1"></i><span class="text-xs font-bold">Foto belum diupload</span></div>`;
 
         grid.innerHTML += `
           <div class="bg-white rounded-2xl border shadow hover:shadow-xl transition overflow-hidden flex flex-col justify-between">
@@ -219,12 +214,12 @@
                 <span class="absolute bottom-2 right-2 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded-lg">Stok: ${p.stock}</span>
               </div>
               <div class="p-4">
-                <h3 class="font-bold text-gray-800 text-sm md:text-base">${p.name}</h3>
-                <div class="text-orangeTheme-primary font-black text-lg">Rp ${(p.price || 7000).toLocaleString('id-ID')}</div>
+                <h3 class="font-bold text-gray-800 text-base">${p.name}</h3>
+                <div class="text-orangeTheme-primary font-black text-xl mt-1">Rp ${(p.price || 7000).toLocaleString('id-ID')}</div>
               </div>
             </div>
             <div class="p-4 pt-0">
-              <button onclick="addToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full ${isOutOfStock ? 'bg-gray-300 text-gray-500' : 'bg-orangeTheme-primary text-white hover:bg-orangeTheme-secondary'} font-bold py-2 rounded-xl text-xs md:text-sm transition shadow">
+              <button onclick="addToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full ${isOutOfStock ? 'bg-gray-300 text-gray-500' : 'bg-orangeTheme-primary text-white hover:bg-orangeTheme-secondary'} font-bold py-2.5 rounded-xl text-sm transition shadow">
                 ${isOutOfStock ? 'Stok Habis' : '+ Tambah ke Keranjang'}
               </button>
             </div>
@@ -287,11 +282,6 @@
     }
     function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
-    function togglePaymentDetails() {
-      const method = document.getElementById('payMethod').value;
-      document.getElementById('paymentDetailBox').classList.toggle('hidden', method !== 'Transfer BNI');
-    }
-
     async function handleCheckoutSubmit(e) {
       e.preventDefault();
       document.getElementById('btnSubmitOrder').disabled = true;
@@ -329,6 +319,7 @@
       }
     }
 
+    // PEMBATALAN PESANAN DARI PEMBELI
     function openCheckOrderModal() { document.getElementById('checkOrderModal').classList.remove('hidden'); }
     function closeCheckOrderModal() { document.getElementById('checkOrderModal').classList.add('hidden'); }
 

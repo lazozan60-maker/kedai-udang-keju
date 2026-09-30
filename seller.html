@@ -22,7 +22,7 @@
   <header class="bg-orangeTheme-primary text-white shadow-md p-4 flex justify-between items-center sticky top-0 z-30">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-orangeTheme-primary font-black text-lg shadow">UK</div>
-      <h1 class="text-lg md:text-xl font-black tracking-tight">Dashboard Penjual Udang Keju</h1>
+      <h1 class="text-lg md:text-xl font-black tracking-tight">Dashboard Penjual Kedai Udang Keju</h1>
     </div>
     <div class="flex items-center gap-2">
       <button id="btnEnableSound" onclick="enableAudioAlert()" class="bg-amber-400 hover:bg-amber-300 text-gray-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
@@ -97,22 +97,21 @@
       </div>
     </div>
 
-    <!-- FITUR PENGATURAN PORTAL PEMBELI / MENU & FOTO -->
+    <!-- PENGATURAN MENU SAUS BANGKOK & FOTO -->
     <div class="bg-white rounded-2xl border shadow-sm p-6 space-y-6">
       <div class="border-b pb-3">
         <h2 class="font-black text-lg text-orangeTheme-primary flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-amber-500"></i> Pengaturan Portal Pembeli (Kelola Menu, Stok & Foto)
+          <i class="fa-solid fa-sliders text-amber-500"></i> Pengaturan Menu & Upload Foto Produk
         </h2>
-        <p class="text-xs text-gray-500">Atur menu yang tampil di Portal Pembeli, edit stok, harga (default Rp 7.000), dan upload URL foto produk.</p>
+        <p class="text-xs text-gray-500">Kelola stok, harga, dan masukkan URL foto untuk menu Udang Keju Saus Bangkok.</p>
       </div>
 
-      <!-- FORM UPLOAD FOTO / EDIT MENU PEMBELI -->
       <form onsubmit="handleSaveProduct(event)" class="bg-amber-50/50 p-4 rounded-xl border grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
         <input type="hidden" id="prodId">
         
         <div class="md:col-span-2">
-          <label class="block text-[11px] font-bold text-gray-600 mb-1">Nama Menu Pembeli</label>
-          <input type="text" id="prodName" required placeholder="Udang Keju Porsi Regular" class="w-full p-2 border rounded-lg text-xs bg-white">
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Nama Menu</label>
+          <input type="text" id="prodName" required placeholder="Udang Keju Saus Bangkok" class="w-full p-2 border rounded-lg text-xs bg-white">
         </div>
 
         <div>
@@ -122,7 +121,7 @@
 
         <div>
           <label class="block text-[11px] font-bold text-gray-600 mb-1">Stok Porsi</label>
-          <input type="number" id="prodStock" required placeholder="20" class="w-full p-2 border rounded-lg text-xs bg-white">
+          <input type="number" id="prodStock" required placeholder="30" class="w-full p-2 border rounded-lg text-xs bg-white">
         </div>
 
         <div>
@@ -137,7 +136,6 @@
         </div>
       </form>
 
-      <!-- TABEL DAFTAR MENU PEMBELI -->
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead>
@@ -159,14 +157,14 @@
   </main>
 
   <script>
-    // Konfigurasi Firebase baru milik Proyek 'kedai-udang-keju'
+    // Konfigurasi Firebase baru dari screenshot
     const firebaseConfig = {
-      apiKey: "AIzaSyBAiwVewOqxDafgK7OXLztvPaVSA3QWIDU",
+      apiKey: "AIzaSyBAiwVewOqDafgK7OKLztvPeVSA3QWiDU",
       authDomain: "kedai-udang-keju.firebaseapp.com",
       projectId: "kedai-udang-keju",
       storageBucket: "kedai-udang-keju.firebasestorage.app",
-      messagingSenderId: "322855383380",
-      appId: "1:322855383380:web:a5119d5d7e24bfb8e058c1",
+      messagingSenderId: "322855383300",
+      appId: "1:322855383300:web:a5119d5d7e24bfb8e058c1",
       measurementId: "G-D4VPMGPNZH"
     };
 
@@ -198,7 +196,7 @@
         playTone(587.33, 0, 0.2);
         playTone(880, 0.25, 0.4);
       } catch (e) {
-        console.log("Audio konteks belum aktif:", e);
+        console.log("Audio belum aktif:", e);
       }
     }
 
@@ -286,7 +284,7 @@
       }
     }
 
-    // PENGATURAN PORTAL PEMBELI (STOK & FOTO)
+    // PENGATURAN STOK & FOTO PRODUK
     db.collection('products').onSnapshot(snapshot => {
       const tbody = document.getElementById('productsTable');
       tbody.innerHTML = '';
