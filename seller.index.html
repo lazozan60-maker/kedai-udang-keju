@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Penjual - Kedai Udang Keju</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { orangeTheme: { primary: '#e65100', secondary: '#f57c00', accent: '#ffb300', bg: '#fff8e1' } } } }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
+
+  <!-- HEADER PORTAL PENJUAL -->
+  <header class="bg-orangeTheme-primary text-white shadow-md p-4 flex justify-between items-center sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-orangeTheme-primary font-black text-lg shadow">UK</div>
+      <h1 class="text-lg md:text-xl font-black tracking-tight">Portal Penjual Kedai Udang Keju</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btnEnableSound" onclick="enableAudioAlert()" class="bg-amber-400 hover:bg-amber-300 text-gray-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
+        <i class="fa-solid fa-bell"></i> <span>Aktifkan Suara Notifikasi</span>
+      </button>
+      <a href="index.html" target="_blank" class="bg-orangeTheme-secondary hover:bg-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
+        <i class="fa-solid fa-store"></i> <span class="hidden md:inline">Buka Halaman Pembeli</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+
+    <!-- RINGKASAN STATISTIK -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold text-gray-400 uppercase">Total Pesanan</div>
+          <div id="statOrders" class="text-3xl font-black text-gray-800 mt-1">0</div>
+        </div>
+        <div class="w-12 h-12 bg-orange-50 text-orangeTheme-primary rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-shopping-cart"></i></div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold text-gray-400 uppercase">Total Pendapatan</div>
+          <div id="statRevenue" class="text-3xl font-black text-emerald-600 mt-1">Rp 0</div>
+        </div>
+        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-wallet"></i></div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold text-gray-400 uppercase">Status Notifikasi</div>
+          <div id="soundStatus" class="text-xs font-bold text-amber-600 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-exclamation"></i> Klik "Aktifkan Suara"
+          </div>
+        </div>
+        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-tower-broadcast"></i></div>
+      </div>
+    </div>
+
+    <!-- TABEL PESANAN REALTIME (DARI DATABASE) -->
+    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+      <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+        <h2 class="font-bold text-gray-800 flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-orangeTheme-primary"></i> Data Pesanan Masuk (Real-Time)
+        </h2>
+        <span class="text-xs text-orangeTheme-primary bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-bold">
+          <i class="fa-solid fa-arrows-rotate animate-spin"></i> Terhubung Firestore
+        </span>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="bg-gray-100 border-b text-gray-600 font-bold uppercase">
+              <th class="p-3">ID / Waktu</th>
+              <th class="p-3">Pelanggan & WA</th>
+              <th class="p-3">Pesanan</th>
+              <th class="p-3">Bayar</th>
+              <th class="p-3">Total</th>
+              <th class="p-3">Maps / Alamat</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable" class="divide-y">
+            <tr><td colspan="8" class="p-4 text-center text-gray-400">Memuat data pesanan...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FORM KELOLA MENU & FOTO -->
+    <div class="bg-white rounded-2xl border shadow-sm p-6 space-y-6">
+      <div class="border-b pb-3">
+        <h2 class="font-black text-lg text-orangeTheme-primary flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-amber-500"></i> Kelola Menu & Upload Foto Produk
+        </h2>
+        <p class="text-xs text-gray-500">Atur stok, harga, dan link foto untuk menu Udang Keju Saus Bangkok.</p>
+      </div>
+
+      <form onsubmit="handleSaveProduct(event)" class="bg-amber-50/50 p-4 rounded-xl border grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+        <input type="hidden" id="prodId">
+        
+        <div class="md:col-span-2">
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Nama Menu</label>
+          <input type="text" id="prodName" required placeholder="Udang Keju Saus Bangkok" class="w-full p-2 border rounded-lg text-xs bg-white">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Harga (Rp)</label>
+          <input type="number" id="prodPrice" required value="7000" class="w-full p-2 border rounded-lg text-xs bg-white">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Stok Porsi</label>
+          <input type="number" id="prodStock" required placeholder="30" class="w-full p-2 border rounded-lg text-xs bg-white">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">URL Foto Produk</label>
+          <input type="url" id="prodImg" placeholder="https://..." class="w-full p-2 border rounded-lg text-xs bg-white">
+        </div>
+
+        <div>
+          <button type="submit" id="btnSaveProd" class="w-full bg-orangeTheme-primary hover:bg-orangeTheme-secondary text-white font-bold p-2 rounded-lg text-xs shadow transition">
+            <i class="fa-solid fa-save mr-1"></i> Simpan Menu
+          </button>
+        </div>
+      </form>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="bg-gray-100 border-b text-gray-600 font-bold uppercase">
+              <th class="p-3">Foto Produk</th>
+              <th class="p-3">Nama Menu</th>
+              <th class="p-3">Harga</th>
+              <th class="p-3">Sisa Stok</th>
+              <th class="p-3 text-center">Aksi Pengaturan</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable" class="divide-y">
+            <tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat daftar menu...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- DATABASE FIREBASE KEDAI-UDANG-KEJU -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAiwVewOqDafgK7OKLztvPeVSA3QWiDU",
+      authDomain: "kedai-udang-keju.firebaseapp.com",
+      projectId: "kedai-udang-keju",
+      storageBucket: "kedai-udang-keju.firebasestorage.app",
+      messagingSenderId: "322855383300",
+      appId: "1:322855383300:web:a5119d5d7e24bfb8e058c1",
+      measurementId: "G-D4VPMGPNZH"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let audioEnabled = false;
+    let isInitialOrderLoad = true;
+
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    function playDingDongSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const playTone = (freq, start, duration) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime + start);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + start + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + start);
+          osc.stop(audioCtx.currentTime + start + duration);
+        };
+        playTone(587.33, 0, 0.2);
+        playTone(880, 0.25, 0.4);
+      } catch (e) {
+        console.log("Audio belum aktif:", e);
+      }
+    }
+
+    function enableAudioAlert() {
+      playDingDongSound();
+      audioEnabled = true;
+      document.getElementById('soundStatus').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> Suara & Notifikasi Aktif';
+      document.getElementById('soundStatus').className = 'text-xs font-bold text-emerald-600 mt-2 flex items-center gap-1.5';
+      document.getElementById('btnEnableSound').className = 'bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5';
+      document.getElementById('btnEnableSound').innerHTML = '<i class="fa-solid fa-check"></i> Suara Aktif';
+    }
+
+    // MONITOR PESANAN REALTIME
+    db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+      const tbody = document.getElementById('ordersTable');
+      tbody.innerHTML = '';
+      let totalRev = 0;
+
+      document.getElementById('statOrders').innerText = snapshot.size;
+
+      if (snapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-gray-400 font-medium">Belum ada pesanan masuk.</td></tr>';
+      }
+
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added' && !isInitialOrderLoad) {
+          const newOrder = change.doc.data();
+          if (audioEnabled) playDingDongSound();
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("🔔 Pesanan Baru Udang Keju!", {
+              body: `Dari: ${newOrder.custName}\nTotal: Rp ${(newOrder.totalPrice || 0).toLocaleString('id-ID')}`,
+              icon: "https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+            });
+          }
+        }
+      });
+
+      snapshot.forEach(doc => {
+        const o = doc.data();
+        const docId = doc.id;
+        if (o.status !== 'Dibatalkan' && o.status !== 'Dibatalkan oleh Pembeli') {
+          totalRev += (o.totalPrice || 0);
+        }
+
+        const itemsStr = o.items ? o.items.map(i => `<span class="inline-block bg-amber-100 text-orangeTheme-primary border border-amber-200 px-1.5 py-0.5 rounded text-[11px] font-bold my-0.5">${i.name} (x${i.qty})</span>`).join(' ') : '-';
+        const mapsStr = o.custMaps ? `<a href="${o.custMaps}" target="_blank" class="text-blue-600 font-bold hover:underline"><i class="fa-solid fa-map-location-dot"></i> Buka Maps</a>` : '<span class="text-gray-400">Tanpa Maps</span>';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40 transition">
+            <td class="p-3 font-medium"><strong>${o.id || docId}</strong><br><span class="text-gray-400 text-[10px]">${o.dateStr || ''}</span></td>
+            <td class="p-3"><strong>${o.custName || '-'}</strong><br><a href="https://wa.me/${o.custWA}" target="_blank" class="text-emerald-700 font-bold"><i class="fa-brands fa-whatsapp"></i> ${o.custWA || '-'}</a></td>
+            <td class="p-3">${itemsStr}</td>
+            <td class="p-3 font-semibold text-gray-700">${o.payMethod || 'COD'}</td>
+            <td class="p-3 font-black text-orangeTheme-primary">Rp ${(o.totalPrice || 0).toLocaleString('id-ID')}</td>
+            <td class="p-3">${mapsStr}<br><span class="text-gray-500 italic block mt-0.5">${o.custNotes || '-'}</span></td>
+            <td class="p-3">
+              <select onchange="updateOrderStatus('${docId}', this.value)" class="p-1 border rounded text-[11px] font-bold bg-white">
+                <option value="Menunggu Konfirmasi" ${o.status === 'Menunggu Konfirmasi' ? 'selected' : ''}>Menunggu</option>
+                <option value="Diproses" ${o.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
+                <option value="Dalam Pengiriman" ${o.status === 'Dalam Pengiriman' ? 'selected' : ''}>Pengiriman</option>
+                <option value="Selesai" ${o.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                <option value="Dibatalkan" ${o.status.includes('Dibatalkan') ? 'selected' : ''}>Dibatalkan</option>
+              </select>
+            </td>
+            <td class="p-3 text-center">
+              <button onclick="deleteOrder('${docId}')" class="text-red-500 hover:text-red-700 p-1" title="Hapus Catatan">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('statRevenue').innerText = `Rp ${totalRev.toLocaleString('id-ID')}`;
+      isInitialOrderLoad = false;
+    });
+
+    function updateOrderStatus(docId, newStatus) {
+      db.collection('orders').doc(docId).update({ status: newStatus });
+    }
+
+    function deleteOrder(docId) {
+      if (confirm('Yakin ingin menghapus rekaman pesanan ini?')) {
+        db.collection('orders').doc(docId).delete();
+      }
+    }
+
+    // PENGATURAN KELOLA STOK & FOTO PRODUK
+    db.collection('products').onSnapshot(snapshot => {
+      const tbody = document.getElementById('productsTable');
+      tbody.innerHTML = '';
+
+      if (snapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Belum ada menu yang disetting.</td></tr>';
+      }
+
+      snapshot.forEach(doc => {
+        const p = doc.data();
+        const pId = doc.id;
+        const imgDisplay = p.img 
+          ? `<img src="${p.img}" class="w-12 h-12 object-cover rounded-lg border shadow-sm">`
+          : `<div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-[10px] font-bold text-center p-1">Belum Ada Foto</div>`;
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3">${imgDisplay}</td>
+            <td class="p-3 font-bold text-gray-800">${p.name}</td>
+            <td class="p-3 font-semibold text-orangeTheme-primary">Rp ${(p.price || 7000).toLocaleString('id-ID')}</td>
+            <td class="p-3 font-black text-gray-700">${p.stock} porsi</td>
+            <td class="p-3 text-center space-x-1">
+              <button onclick="quickUpdateStock('${pId}', ${p.stock + 5})" class="bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded text-[10px] hover:bg-emerald-200">+5 Stok</button>
+              <button onclick="editProduct('${pId}', '${p.name.replace(/'/g, "\\'")}', ${p.price || 7000}, ${p.stock}, '${(p.img || '').replace(/'/g, "\\'")}')" class="bg-amber-100 text-amber-800 font-bold px-2 py-1 rounded text-[10px] hover:bg-amber-200">Edit / Upload Foto</button>
+              <button onclick="deleteProduct('${pId}')" class="bg-red-100 text-red-800 font-bold px-2 py-1 rounded text-[10px] hover:bg-red-200">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    });
+
+    async function handleSaveProduct(e) {
+      e.preventDefault();
+      const id = document.getElementById('prodId').value;
+      const name = document.getElementById('prodName').value;
+      const price = parseInt(document.getElementById('prodPrice').value) || 7000;
+      const stock = parseInt(document.getElementById('prodStock').value);
+      const img = document.getElementById('prodImg').value.trim();
+
+      const data = { name, price, stock, img };
+
+      if (id) {
+        await db.collection('products').doc(id).update(data);
+      } else {
+        await db.collection('products').add(data);
+      }
+
+      document.getElementById('prodId').value = '';
+      document.getElementById('prodName').value = '';
+      document.getElementById('prodPrice').value = '7000';
+      document.getElementById('prodStock').value = '';
+      document.getElementById('prodImg').value = '';
+      document.getElementById('btnSaveProd').innerHTML = '<i class="fa-solid fa-save mr-1"></i> Simpan Menu';
+    }
+
+    function editProduct(id, name, price, stock, img) {
+      document.getElementById('prodId').value = id;
+      document.getElementById('prodName').value = name;
+      document.getElementById('prodPrice').value = price || 7000;
+      document.getElementById('prodStock').value = stock;
+      document.getElementById('prodImg').value = img || '';
+      document.getElementById('btnSaveProd').innerHTML = '<i class="fa-solid fa-check mr-1"></i> Update Menu';
+    }
+
+    function quickUpdateStock(id, newStock) {
+      db.collection('products').doc(id).update({ stock: newStock });
+    }
+
+    function deleteProduct(id) {
+      if (confirm('Yakin ingin menghapus menu ini dari portal pembeli?')) {
+        db.collection('products').doc(id).delete();
+      }
+    }
+  </script>
+</body>
+</html>
