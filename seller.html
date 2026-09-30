@@ -19,17 +19,18 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
 
+  <!-- HEADER PORTAL PENJUAL -->
   <header class="bg-orangeTheme-primary text-white shadow-md p-4 flex justify-between items-center sticky top-0 z-30">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-orangeTheme-primary font-black text-lg shadow">UK</div>
-      <h1 class="text-lg md:text-xl font-black tracking-tight">Dashboard Penjual Kedai Udang Keju</h1>
+      <h1 class="text-lg md:text-xl font-black tracking-tight">Portal Penjual Kedai Udang Keju</h1>
     </div>
     <div class="flex items-center gap-2">
       <button id="btnEnableSound" onclick="enableAudioAlert()" class="bg-amber-400 hover:bg-amber-300 text-gray-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
         <i class="fa-solid fa-bell"></i> <span>Aktifkan Suara Notifikasi</span>
       </button>
       <a href="index.html" target="_blank" class="bg-orangeTheme-secondary hover:bg-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
-        <i class="fa-solid fa-store"></i> <span class="hidden md:inline">Lihat Portal Pembeli</span>
+        <i class="fa-solid fa-store"></i> <span class="hidden md:inline">Buka Halaman Pembeli</span>
       </a>
     </div>
   </header>
@@ -65,7 +66,7 @@
       </div>
     </div>
 
-    <!-- TABEL PESANAN REALTIME -->
+    <!-- TABEL PESANAN REALTIME (DARI DATABASE) -->
     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
       <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
         <h2 class="font-bold text-gray-800 flex items-center gap-2">
@@ -91,19 +92,19 @@
             </tr>
           </thead>
           <tbody id="ordersTable" class="divide-y">
-            <tr><td colspan="8" class="p-4 text-center text-gray-400">Memuat pesanan...</td></tr>
+            <tr><td colspan="8" class="p-4 text-center text-gray-400">Memuat data pesanan...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- PENGATURAN MENU SAUS BANGKOK & FOTO -->
+    <!-- FORM KELOLA MENU & FOTO -->
     <div class="bg-white rounded-2xl border shadow-sm p-6 space-y-6">
       <div class="border-b pb-3">
         <h2 class="font-black text-lg text-orangeTheme-primary flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-amber-500"></i> Pengaturan Menu & Upload Foto Produk
+          <i class="fa-solid fa-sliders text-amber-500"></i> Kelola Menu & Upload Foto Produk
         </h2>
-        <p class="text-xs text-gray-500">Kelola stok, harga, dan masukkan URL foto untuk menu Udang Keju Saus Bangkok.</p>
+        <p class="text-xs text-gray-500">Atur stok, harga, dan link foto untuk menu Udang Keju Saus Bangkok.</p>
       </div>
 
       <form onsubmit="handleSaveProduct(event)" class="bg-amber-50/50 p-4 rounded-xl border grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
@@ -148,7 +149,7 @@
             </tr>
           </thead>
           <tbody id="productsTable" class="divide-y">
-            <tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat menu...</td></tr>
+            <tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat daftar menu...</td></tr>
           </tbody>
         </table>
       </div>
@@ -156,8 +157,8 @@
 
   </main>
 
+  <!-- DATABASE FIREBASE KEDAI-UDANG-KEJU -->
   <script>
-    // Konfigurasi Firebase baru dari screenshot
     const firebaseConfig = {
       apiKey: "AIzaSyBAiwVewOqDafgK7OKLztvPeVSA3QWiDU",
       authDomain: "kedai-udang-keju.firebaseapp.com",
@@ -284,7 +285,7 @@
       }
     }
 
-    // PENGATURAN STOK & FOTO PRODUK
+    // PENGATURAN KELOLA STOK & FOTO PRODUK
     db.collection('products').onSnapshot(snapshot => {
       const tbody = document.getElementById('productsTable');
       tbody.innerHTML = '';
