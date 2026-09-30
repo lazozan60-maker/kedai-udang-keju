@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kedai Udang Keju - Lumer & Gurih</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            orangeTheme: { primary: '#e65100', secondary: '#f57c00', accent: '#ffb300', bg: '#fff8e1' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-orangeTheme-bg text-gray-800 font-sans min-h-screen flex flex-col">
+
+  <!-- TOP BANNER -->
+  <div class="bg-orangeTheme-primary text-white text-xs md:text-sm py-2 px-4 text-center font-medium flex justify-between items-center">
+    <div class="hidden md:block text-amber-200"><i class="fa-solid fa-clock mr-1"></i> Ready: Senin - Jumat (15.00 - 21.00)</div>
+    <div class="mx-auto md:mx-0 flex items-center gap-2">
+      <span class="bg-amber-400 text-xs px-2 py-0.5 rounded font-bold text-gray-900">BISA COD</span>
+      <span>Keju Lumer & Udang Gurih • <strong>Cuma Rp 7.000!</strong></span>
+    </div>
+    <div class="hidden md:block text-xs text-amber-100"><i class="fa-brands fa-whatsapp mr-1"></i> 081996877864</div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-orangeTheme-secondary text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <a href="#" class="flex items-center gap-3">
+        <div class="w-11 h-11 bg-amber-400 rounded-xl flex items-center justify-center text-orangeTheme-primary font-black text-xl shadow border-2 border-amber-200">UK</div>
+        <div>
+          <span class="text-xl md:text-2xl font-black tracking-tight block leading-none">UDANG KEJU</span>
+          <span class="text-[10px] text-amber-100 tracking-wider uppercase font-semibold">Renyah Di Luar, Lumer Di Dalam</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-3">
+        <button onclick="openCheckOrderModal()" class="text-xs bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-receipt"></i> <span>Cek / Batal Pesanan</span>
+        </button>
+        <button onclick="toggleCartDrawer()" class="relative bg-orangeTheme-primary p-2.5 rounded-full hover:bg-orange-800 transition">
+          <i class="fa-solid fa-shopping-bag text-lg text-amber-300"></i>
+          <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+    <!-- HERO BANNER -->
+    <div class="bg-gradient-to-r from-orange-600 to-amber-500 rounded-2xl p-6 md:p-8 text-white shadow-xl mb-8 border border-orange-400">
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 bg-white/20 text-white border border-white/30 px-3 py-1 rounded-full text-xs font-bold mb-3">
+          <i class="fa-solid fa-cheese"></i> Keju Lumer & Udang Gurih
+        </div>
+        <h1 class="text-2xl md:text-4xl font-extrabold mb-2 leading-tight">Udang Keju Krispi - Cuma Rp 7.000!</h1>
+        <p class="text-amber-100 text-sm md:text-base mb-4">Nikmati kelezatan udang gurih berlapis keju lumer dengan harga super terjangkau.</p>
+        <div class="flex flex-wrap gap-2 text-xs font-bold">
+          <span class="bg-white/20 px-3 py-1 rounded-lg">✨ Renyah di luar</span>
+          <span class="bg-white/20 px-3 py-1 rounded-lg">🧀 Lumer di dalam</span>
+          <span class="bg-white/20 px-3 py-1 rounded-lg">🛵 Bisa COD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENU SECTION -->
+    <section id="menu-section" class="mb-10">
+      <h2 class="text-2xl font-black text-orangeTheme-primary mb-6 flex items-center gap-2">
+        <i class="fa-solid fa-utensils"></i> Pilih Menu Udang Keju
+      </h2>
+      <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
+    </section>
+  </main>
+
+  <!-- DRAWER KERANJANG -->
+  <div id="cartDrawer" class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300">
+    <div class="absolute inset-0 bg-black/50" onclick="toggleCartDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col z-10">
+      <div class="bg-orangeTheme-secondary text-white p-4 flex items-center justify-between">
+        <h3 class="font-bold text-lg"><i class="fa-solid fa-cart-shopping text-amber-300 mr-2"></i>Keranjang Belanja</h3>
+        <button onclick="toggleCartDrawer()" class="text-2xl">&times;</button>
+      </div>
+      <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+      <div class="p-4 border-t bg-gray-50 space-y-3">
+        <div class="flex justify-between font-black text-lg"><span>Total:</span><span id="cartTotal" class="text-orangeTheme-primary">Rp 0</span></div>
+        <button onclick="openCheckoutModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold py-3 rounded-xl shadow">Lanjut Pemesanan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHECKOUT -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border p-6 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-lg text-orangeTheme-primary">Form Pemesanan Udang Keju</h3>
+        <button onclick="closeCheckoutModal()" class="text-gray-500 text-2xl">&times;</button>
+      </div>
+      <form onsubmit="handleCheckoutSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold mb-1">Nama Pemesan *</label>
+          <input type="text" id="custName" required placeholder="Contoh: Budi" class="w-full border p-2.5 text-sm rounded-lg">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Nomor WhatsApp *</label>
+          <input type="tel" id="custWA" required placeholder="Contoh: 081996877864" class="w-full border p-2.5 text-sm rounded-lg">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Share Lokasi Maps (Opsional)</label>
+          <input type="url" id="custMaps" placeholder="https://maps.app.goo.gl/..." class="w-full border p-2.5 text-sm rounded-lg">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Alamat Lengkap / Catatan</label>
+          <textarea id="custNotes" rows="2" placeholder="Detail alamat atau level pedas saus" class="w-full border p-2.5 text-sm rounded-lg"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Metode Pembayaran *</label>
+          <select id="payMethod" onchange="togglePaymentDetails()" class="w-full border p-2.5 text-sm rounded-lg font-bold">
+            <option value="COD / Cash">COD (Bayar Tunai saat Kurir Sampai)</option>
+            <option value="Transfer BNI">Transfer Bank BNI</option>
+          </select>
+        </div>
+        <div id="paymentDetailBox" class="hidden bg-amber-50 p-3 rounded-xl border text-xs space-y-1">
+          <strong>Rekening BNI:</strong> <span class="font-black text-orangeTheme-primary">1888719845</span> (a.n Tri Wulandari)
+        </div>
+        <button type="submit" id="btnSubmitOrder" class="w-full bg-orangeTheme-primary hover:bg-orangeTheme-secondary text-white font-bold py-3 rounded-xl shadow">Konfirmasi & Kirim Pesanan</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CEK / BATAL PESANAN -->
+  <div id="checkOrderModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-lg text-orangeTheme-primary"><i class="fa-solid fa-search"></i> Cek / Pembatalan Pesanan</h3>
+        <button onclick="closeCheckOrderModal()" class="text-gray-500 text-2xl">&times;</button>
+      </div>
+      <div class="space-y-2">
+        <label class="block text-xs font-bold">Masukkan Nomor WhatsApp Anda:</label>
+        <div class="flex gap-2">
+          <input type="tel" id="searchWA" placeholder="0819..." class="flex-1 border p-2 text-sm rounded-lg">
+          <button onclick="searchCustomerOrders()" class="bg-orangeTheme-primary text-white font-bold px-4 py-2 rounded-lg text-xs">Cari</button>
+        </div>
+      </div>
+      <div id="customerOrdersList" class="space-y-3 max-h-60 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- MODAL SUKSES -->
+  <div id="successModal" class="fixed inset-0 z-50 hidden bg-black/60 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto"><i class="fa-solid fa-check"></i></div>
+      <h3 class="font-black text-xl text-orangeTheme-primary">Pesanan Berhasil Disimpan!</h3>
+      <p class="text-xs text-gray-500">ID Pesanan Anda: <strong id="outOrderId" class="text-gray-800"></strong></p>
+      <button onclick="location.reload()" class="w-full bg-orangeTheme-primary text-white font-bold py-2.5 rounded-xl shadow text-sm">Selesai</button>
+    </div>
+  </div>
+
+  <script>
+    // Konfigurasi Firebase baru milik Proyek 'kedai-udang-keju'
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAiwVewOqxDafgK7OXLztvPaVSA3QWIDU",
+      authDomain: "kedai-udang-keju.firebaseapp.com",
+      projectId: "kedai-udang-keju",
+      storageBucket: "kedai-udang-keju.firebasestorage.app",
+      messagingSenderId: "322855383380",
+      appId: "1:322855383380:web:a5119d5d7e24bfb8e058c1",
+      measurementId: "G-D4VPMGPNZH"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const initialDefaultProducts = [
+      { id: "1", name: 'Udang Keju Porsi Regular (Isi 4)', price: 7000, stock: 30, badge: 'Terlaris', img: '' },
+      { id: "2", name: 'Udang Keju Super Pedas', price: 7000, stock: 25, badge: 'Favorit', img: '' },
+      { id: "3", name: 'Udang Keju Extra Keju Lumer', price: 7000, stock: 20, badge: 'Spesial', img: '' }
+    ];
+
+    let products = [];
+    let cart = [];
+
+    db.collection('products').onSnapshot(snapshot => {
+      if (snapshot.empty) {
+        initialDefaultProducts.forEach(p => db.collection('products').doc(p.id).set(p));
+      } else {
+        products = [];
+        snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+        renderProductsUI();
+      }
+    });
+
+    function renderProductsUI() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+
+      products.forEach(p => {
+        const isOutOfStock = p.stock <= 0;
+        const imageHTML = p.img 
+          ? `<img src="${p.img}" class="w-full h-full object-cover">`
+          : `<div class="w-full h-full bg-amber-100 flex flex-col items-center justify-center text-amber-600"><i class="fa-solid fa-image text-3xl mb-1"></i><span class="text-[10px] font-bold">Foto belum diupload</span></div>`;
+
+        grid.innerHTML += `
+          <div class="bg-white rounded-2xl border shadow hover:shadow-xl transition overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="relative aspect-square overflow-hidden">
+                ${imageHTML}
+                ${p.badge ? `<span class="absolute top-2 left-2 bg-amber-500 text-gray-900 font-black text-[10px] px-2 py-0.5 rounded-full shadow">${p.badge}</span>` : ''}
+                <span class="absolute bottom-2 right-2 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded-lg">Stok: ${p.stock}</span>
+              </div>
+              <div class="p-4">
+                <h3 class="font-bold text-gray-800 text-sm md:text-base">${p.name}</h3>
+                <div class="text-orangeTheme-primary font-black text-lg">Rp ${(p.price || 7000).toLocaleString('id-ID')}</div>
+              </div>
+            </div>
+            <div class="p-4 pt-0">
+              <button onclick="addToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full ${isOutOfStock ? 'bg-gray-300 text-gray-500' : 'bg-orangeTheme-primary text-white hover:bg-orangeTheme-secondary'} font-bold py-2 rounded-xl text-xs md:text-sm transition shadow">
+                ${isOutOfStock ? 'Stok Habis' : '+ Tambah ke Keranjang'}
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function addToCart(id) {
+      const p = products.find(prod => prod.id === id);
+      if (!p || p.stock <= 0) return;
+      const item = cart.find(c => c.id === id);
+      if (item) {
+        if (item.qty < p.stock) item.qty++;
+      } else cart.push({ ...p, qty: 1 });
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      document.getElementById('cartBadge').innerText = cart.reduce((acc, i) => acc + i.qty, 0);
+      const container = document.getElementById('cartItemsContainer');
+      container.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(i => {
+        total += (i.price || 7000) * i.qty;
+        container.innerHTML += `
+          <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-xl border">
+            <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 font-bold text-xs overflow-hidden">
+              ${i.img ? `<img src="${i.img}" class="w-full h-full object-cover">` : 'UK'}
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-xs">${i.name}</h4>
+              <div class="text-xs font-black text-orangeTheme-primary">Rp ${(i.price || 7000).toLocaleString('id-ID')}</div>
+            </div>
+            <div class="flex items-center gap-2 border bg-white px-2 py-1 rounded">
+              <button onclick="changeQty('${i.id}', -1)" class="font-bold px-1">-</button>
+              <span class="text-xs font-bold">${i.qty}</span>
+              <button onclick="changeQty('${i.id}', 1)" class="font-bold px-1">+</button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('cartTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+      updateCartUI();
+    }
+
+    function toggleCartDrawer() { document.getElementById('cartDrawer').classList.toggle('translate-x-full'); }
+    function openCheckoutModal() { 
+      if(cart.length === 0) return alert('Keranjang belanja Anda masih kosong!');
+      toggleCartDrawer(); 
+      document.getElementById('checkoutModal').classList.remove('hidden'); 
+    }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
+
+    function togglePaymentDetails() {
+      const method = document.getElementById('payMethod').value;
+      document.getElementById('paymentDetailBox').classList.toggle('hidden', method !== 'Transfer BNI');
+    }
+
+    async function handleCheckoutSubmit(e) {
+      e.preventDefault();
+      document.getElementById('btnSubmitOrder').disabled = true;
+
+      const orderId = 'UK-' + Date.now().toString().slice(-6);
+      const orderData = {
+        id: orderId,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        dateStr: new Date().toLocaleString('id-ID'),
+        custName: document.getElementById('custName').value,
+        custWA: document.getElementById('custWA').value,
+        custMaps: document.getElementById('custMaps').value,
+        custNotes: document.getElementById('custNotes').value,
+        items: cart,
+        totalPrice: cart.reduce((acc, i) => acc + ((i.price || 7000) * i.qty), 0),
+        payMethod: document.getElementById('payMethod').value,
+        status: 'Menunggu Konfirmasi'
+      };
+
+      try {
+        await db.collection('orders').add(orderData);
+        for (let item of cart) {
+          const prod = products.find(p => p.id === item.id);
+          if (prod) {
+            const newStock = Math.max(0, prod.stock - item.qty);
+            await db.collection('products').doc(item.id).update({ stock: newStock });
+          }
+        }
+        closeCheckoutModal();
+        document.getElementById('outOrderId').innerText = orderId;
+        document.getElementById('successModal').classList.remove('hidden');
+      } catch (error) {
+        alert('Gagal mengirim pesanan: ' + error.message);
+        document.getElementById('btnSubmitOrder').disabled = false;
+      }
+    }
+
+    function openCheckOrderModal() { document.getElementById('checkOrderModal').classList.remove('hidden'); }
+    function closeCheckOrderModal() { document.getElementById('checkOrderModal').classList.add('hidden'); }
+
+    async function searchCustomerOrders() {
+      const wa = document.getElementById('searchWA').value.trim();
+      const listEl = document.getElementById('customerOrdersList');
+      listEl.innerHTML = '<p class="text-xs text-center text-gray-400">Mencari pesanan...</p>';
+
+      if (!wa) return alert('Masukkan nomor WhatsApp!');
+
+      const snapshot = await db.collection('orders').where('custWA', '==', wa).get();
+      listEl.innerHTML = '';
+
+      if (snapshot.empty) {
+        listEl.innerHTML = '<p class="text-xs text-center text-red-500 font-bold">Tidak ada pesanan ditemukan dengan nomor WA ini.</p>';
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const o = doc.data();
+        const docId = doc.id;
+        const canCancel = (o.status === 'Menunggu Konfirmasi');
+
+        listEl.innerHTML += `
+          <div class="p-3 border rounded-xl bg-gray-50 text-xs space-y-1">
+            <div class="flex justify-between font-bold">
+              <span>ID: ${o.id || docId}</span>
+              <span class="text-orangeTheme-primary">${o.status}</span>
+            </div>
+            <div>Total: Rp ${(o.totalPrice || 0).toLocaleString('id-ID')}</div>
+            ${canCancel 
+              ? `<button onclick="cancelMyOrder('${docId}')" class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 rounded-lg text-xs">Batalkan Pesanan Ini</button>`
+              : `<p class="text-[10px] text-gray-400 italic mt-1">Pesanan tidak dapat dibatalkan (sedang diproses/selesai).</p>`
+            }
+          </div>
+        `;
+      });
+    }
+
+    async function cancelMyOrder(docId) {
+      if (confirm('Yakin ingin membatalkan pesanan ini?')) {
+        await db.collection('orders').doc(docId).update({ status: 'Dibatalkan oleh Pembeli' });
+        alert('Pesanan berhasil dibatalkan!');
+        searchCustomerOrders();
+      }
+    }
+  </script>
+</body>
+</html>
