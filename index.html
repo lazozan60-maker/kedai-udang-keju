@@ -29,7 +29,7 @@
   <div class="bg-orangeTheme-primary text-white text-xs md:text-sm py-2 px-4 text-center font-medium flex justify-between items-center">
     <div class="hidden md:block text-amber-200"><i class="fa-solid fa-clock mr-1"></i> Ready: Senin - Jumat (15.00 - 21.00)</div>
     <div class="mx-auto md:mx-0 flex items-center gap-2">
-      <span class="bg-amber-400 text-xs px-2 py-0.5 rounded font-bold text-gray-900">BISA COD</span>
+      <span class="bg-amber-400 text-xs px-2 py-0.5 rounded font-bold text-gray-900">BISA COD & QRIS</span>
       <span>Udang Keju Saus Bangkok • <strong>Cuma Rp 7.000!</strong></span>
     </div>
     <div class="hidden md:block text-xs text-amber-100"><i class="fa-solid fa-store mr-1"></i> Kedai Udang Keju</div>
@@ -69,7 +69,7 @@
         <div class="flex flex-wrap gap-2 text-xs font-bold">
           <span class="bg-white/20 px-3 py-1 rounded-lg">✨ Renyah di luar</span>
           <span class="bg-white/20 px-3 py-1 rounded-lg">🧀 Lumer di dalam</span>
-          <span class="bg-white/20 px-3 py-1 rounded-lg">🛵 Bisa COD</span>
+          <span class="bg-white/20 px-3 py-1 rounded-lg">🛵 Bisa COD & QRIS</span>
         </div>
       </div>
     </div>
@@ -123,14 +123,32 @@
           <label class="block text-xs font-bold mb-1">Alamat Lengkap / Catatan</label>
           <textarea id="custNotes" rows="2" placeholder="Detail alamat rumah atau instruksi pengiriman" class="w-full border p-2.5 text-sm rounded-lg"></textarea>
         </div>
+        
         <div>
           <label class="block text-xs font-bold mb-1">Metode Pembayaran *</label>
-          <select id="payMethod" class="w-full border p-2.5 text-sm rounded-lg font-bold">
+          <select id="payMethod" onchange="toggleQrisDisplay()" class="w-full border p-2.5 text-sm rounded-lg font-bold">
             <option value="COD / Cash">COD (Bayar Tunai saat Kurir Sampai)</option>
-            <option value="Transfer Bank">Transfer Bank</option>
+            <option value="QRIS">QRIS (Scan Barcode Bank / E-Wallet)</option>
           </select>
         </div>
-        <button type="submit" id="btnSubmitOrder" class="w-full bg-orangeTheme-primary hover:bg-orangeTheme-secondary text-white font-bold py-3 rounded-xl shadow">Konfirmasi & Kirim Pesanan</button>
+
+        <!-- TAMPILAN QRIS (MUNCUL JIKA QRIS DIPILIH) -->
+        <div id="qrisContainer" class="hidden bg-orange-50 border border-orange-200 p-4 rounded-xl text-center space-y-2">
+          <p class="text-xs font-bold text-gray-700">Silakan Scan Kode QRIS di Bawah Ini:</p>
+          <div class="bg-white p-3 rounded-lg shadow-inner inline-block border">
+            <!-- QR Code Lazo Store (Link Terbaru) -->
+            <img src="https://i.ibb.co.com/WQ371Lk/Whats-App-Image-2026-10-01-at-21-20-34.jpg" alt="QRIS Lazo Store" class="w-56 h-auto mx-auto rounded shadow-sm">
+          </div>
+          <div class="text-xs text-gray-600 font-semibold">
+            <p class="text-orangeTheme-primary font-bold text-sm">lazo store</p>
+            <p>NMID : ID1026510958998</p>
+            <p class="text-[10px] text-gray-500 mt-1">Bisa di-scan menggunakan GoPay, OVO, Dana, ShopeePay, BCA Mobile, Livin', dll.</p>
+          </div>
+        </div>
+
+        <button type="submit" id="btnSubmitOrder" class="w-full bg-orangeTheme-primary hover:bg-orangeTheme-secondary text-white font-bold py-3 rounded-xl shadow flex items-center justify-center gap-2">
+          <span>Konfirmasi & Kirim Pesanan</span>
+        </button>
       </form>
     </div>
   </div>
@@ -164,7 +182,6 @@
   </div>
 
   <script>
-    // Konfigurasi Firebase baru dari screenshot
     const firebaseConfig = {
       apiKey: "AIzaSyBAiwVewOqDafgK7OKLztvPeVSA3QWiDU",
       authDomain: "kedai-udang-keju.firebaseapp.com",
@@ -193,6 +210,8 @@
         snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
         renderProductsUI();
       }
+    }, error => {
+      console.error("Gagal membaca produk dari Firestore:", error);
     });
 
     function renderProductsUI() {
@@ -282,9 +301,21 @@
     }
     function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
+    function toggleQrisDisplay() {
+      const payMethod = document.getElementById('payMethod').value;
+      const qrisBox = document.getElementById('qrisContainer');
+      if (payMethod === 'QRIS') {
+        qrisBox.classList.remove('hidden');
+      } else {
+        qrisBox.classList.add('hidden');
+      }
+    }
+
     async function handleCheckoutSubmit(e) {
       e.preventDefault();
-      document.getElementById('btnSubmitOrder').disabled = true;
+      const btn = document.getElementById('btnSubmitOrder');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mengirim Pesanan...';
 
       const orderId = 'UK-' + Date.now().toString().slice(-6);
       const orderData = {
@@ -314,12 +345,12 @@
         document.getElementById('outOrderId').innerText = orderId;
         document.getElementById('successModal').classList.remove('hidden');
       } catch (error) {
-        alert('Gagal mengirim pesanan: ' + error.message);
-        document.getElementById('btnSubmitOrder').disabled = false;
+        alert('Gagal mengirim pesanan!\n\nPenyebab: ' + error.message + '\n\nSilakan pastikan aturan (Rules) di Firebase Console sudah di-publish dengan "allow read, write: if true;".');
+        btn.disabled = false;
+        btn.innerHTML = 'Konfirmasi & Kirim Pesanan';
       }
     }
 
-    // PEMBATALAN PESANAN DARI PEMBELI
     function openCheckOrderModal() { document.getElementById('checkOrderModal').classList.remove('hidden'); }
     function closeCheckOrderModal() { document.getElementById('checkOrderModal').classList.add('hidden'); }
 
@@ -330,33 +361,38 @@
 
       if (!wa) return alert('Masukkan nomor WhatsApp!');
 
-      const snapshot = await db.collection('orders').where('custWA', '==', wa).get();
-      listEl.innerHTML = '';
+      try {
+        const snapshot = await db.collection('orders').where('custWA', '==', wa).get();
+        listEl.innerHTML = '';
 
-      if (snapshot.empty) {
-        listEl.innerHTML = '<p class="text-xs text-center text-red-500 font-bold">Tidak ada pesanan ditemukan dengan nomor WA ini.</p>';
-        return;
-      }
+        if (snapshot.empty) {
+          listEl.innerHTML = '<p class="text-xs text-center text-red-500 font-bold">Tidak ada pesanan ditemukan dengan nomor WA ini.</p>';
+          return;
+        }
 
-      snapshot.forEach(doc => {
-        const o = doc.data();
-        const docId = doc.id;
-        const canCancel = (o.status === 'Menunggu Konfirmasi');
+        snapshot.forEach(doc => {
+          const o = doc.data();
+          const docId = doc.id;
+          const canCancel = (o.status === 'Menunggu Konfirmasi');
 
-        listEl.innerHTML += `
-          <div class="p-3 border rounded-xl bg-gray-50 text-xs space-y-1">
-            <div class="flex justify-between font-bold">
-              <span>ID: ${o.id || docId}</span>
-              <span class="text-orangeTheme-primary">${o.status}</span>
+          listEl.innerHTML += `
+            <div class="p-3 border rounded-xl bg-gray-50 text-xs space-y-1">
+              <div class="flex justify-between font-bold">
+                <span>ID: ${o.id || docId}</span>
+                <span class="text-orangeTheme-primary">${o.status}</span>
+              </div>
+              <div>Total: Rp ${(o.totalPrice || 0).toLocaleString('id-ID')}</div>
+              <div>Metode: <strong class="text-gray-700">${o.payMethod || 'COD'}</strong></div>
+              ${canCancel 
+                ? `<button onclick="cancelMyOrder('${docId}')" class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 rounded-lg text-xs">Batalkan Pesanan Ini</button>`
+                : `<p class="text-[10px] text-gray-400 italic mt-1">Pesanan tidak dapat dibatalkan (sedang diproses/selesai).</p>`
+              }
             </div>
-            <div>Total: Rp ${(o.totalPrice || 0).toLocaleString('id-ID')}</div>
-            ${canCancel 
-              ? `<button onclick="cancelMyOrder('${docId}')" class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 rounded-lg text-xs">Batalkan Pesanan Ini</button>`
-              : `<p class="text-[10px] text-gray-400 italic mt-1">Pesanan tidak dapat dibatalkan (sedang diproses/selesai).</p>`
-            }
-          </div>
-        `;
-      });
+          `;
+        });
+      } catch (e) {
+        listEl.innerHTML = `<p class="text-xs text-center text-red-500 font-bold">Gagal mengambil data: ${e.message}</p>`;
+      }
     }
 
     async function cancelMyOrder(docId) {
